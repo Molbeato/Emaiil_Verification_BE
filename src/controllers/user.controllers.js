@@ -134,16 +134,11 @@ const newUserPassword = catchError(async(req,res) => {
     if(!emailCode) return res.status(401).json({ message: "Invalid code" })
 
     const newEncryptedPassword = await bcrypt.hash(password, 10)
-
     const user = await User.findByPk(emailCode.userId)
+    user.password = newEncryptedPassword;
     await user.save()
-    await emailCode.destroy()
 
-    const result = await User.update({
-        password: newEncryptedPassword
-    }, {where: {} })
-
-    return res.status(201).json(result);
+    return res.status(201).json(user);
 })
 
 
